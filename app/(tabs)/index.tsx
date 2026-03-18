@@ -1,23 +1,35 @@
-import { useRouter } from "expo-router";
-import { Button, StyleSheet, Text, View } from "react-native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect, useRouter } from "expo-router";
+import React, { useState } from 'react';
+import { Button, FlatList, StyleSheet, Text, View } from "react-native";
 
 export default function HomeScreen() {
   const router = useRouter();
+  const [transactions, setTransactions] = useState<number[]>([]);
+
+  const loadTransactions = async () => {
+    const stored = await AsyncStorage.getItem('@transactions');
+    const data = stored ? JSON.parse(stored) : [];
+    setTransactions(data);
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      loadTransactions();
+    }, [])
+  );
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}> Welcome to Ryans Bookkeeping App</Text>
-
       <Text style={styles.subtitle}>Your homepage</Text>
 
-      <Button
-        title="Go to Modal"
-        onPress={() => router.push("/modal")} // opens modal.tsx
-      />
-
-      <Button
-        title="Click me!"
-        onPress={() => alert("You clicked the button!")}
+      <Button title="Add Transaction" onPress={() => router.push("/modal")} />
+      <Text style={styles.title}>Transactions:</Text>
+      <FlatList
+        data={transactions}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item }) => <Text style={styles.item}>{item} </Text>}
       />
     </View>
   );
@@ -39,7 +51,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginBottom: 20,
   },
+  item: {
+    fontSize: 18,
+    padding: 5,
+  },
 });
+
+// Example change
 
 // import { Image } from "expo-image";
 // import { Platform, StyleSheet } from "react-native";
