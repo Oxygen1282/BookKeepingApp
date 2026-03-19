@@ -46,7 +46,7 @@ export default function RemoveTransactionScreen() {
 
       <FlatList
         data={transactions}
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={(index) => index.toString()}
         renderItem={({ item, index }) => (
           <Pressable
             onPress={() => deleteTransaction(index)}
