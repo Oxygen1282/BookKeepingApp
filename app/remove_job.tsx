@@ -17,7 +17,7 @@ export default function RemoveJobs() {
     setJobs(data);
   };
 
-  // Run once when modal opens
+  // Run once when screen loads
   useEffect(() => {
     loadJobs();
   }, []);

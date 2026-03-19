@@ -41,7 +41,10 @@ export default function HomeScreen() {
         data={jobs}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <Pressable style={styles.item}>
+          <Pressable
+            style={styles.item}
+            onPress={() => router.push(`/edit_job_data?jobId=${item.id}`)}
+          >
             <Text>{item.title}</Text>
             <Text>{item.entries.length} entries</Text>
           </Pressable>
