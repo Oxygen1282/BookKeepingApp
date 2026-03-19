@@ -1,42 +1,51 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useState } from "react";
-import { Button, FlatList, StyleSheet, Text, View } from "react-native";
+import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import { Job } from "../jobs_entries_type";
 
 export default function HomeScreen() {
   const router = useRouter();
-  const [transactions, setTransactions] = useState<number[]>([]);
+  const [jobs, setJobs] = useState<Job[]>([]);
 
-  const loadTransactions = async () => {
-    const stored = await AsyncStorage.getItem("@transactions");
-    const data = stored ? JSON.parse(stored) : [];
-    setTransactions(data);
+  const loadJobs = async () => {
+    const stored = await AsyncStorage.getItem("@jobs");
+    const data: Job[] = stored ? JSON.parse(stored) : [];
+    setJobs(data);
   };
 
   useFocusEffect(
     React.useCallback(() => {
-      loadTransactions();
+      loadJobs();
     }, []),
   );
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}> Welcome to Ryans Bookkeeping App</Text>
-      <Text style={styles.subtitle}>Your homepage</Text>
 
-      <Button
-        title="Add Transaction"
-        onPress={() => router.push("/add_transaction")}
-      />
-      <Button
-        title="Remove Transaction"
-        onPress={() => router.push("/remove_transaction")}
-      />
-      <Text style={styles.title}>Transactions:</Text>
+      <Pressable style={styles.button} onPress={() => router.push("./add_job")}>
+        <Text style={styles.buttonText}>Add Job</Text>
+      </Pressable>
+
+      <Pressable
+        style={styles.button}
+        onPress={() => router.push("./remove_job")}
+      >
+        <Text style={styles.buttonText}>Remove Job</Text>
+      </Pressable>
+
+      <Text style={styles.title}>Jobs:</Text>
+
       <FlatList
-        data={transactions}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => <Text style={styles.item}>{item} </Text>}
+        data={jobs}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <Pressable style={styles.item}>
+            <Text>{item.title}</Text>
+            <Text>{item.entries.length} entries</Text>
+          </Pressable>
+        )}
       />
     </View>
   );
@@ -54,12 +63,22 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 10,
   },
-  subtitle: {
+  itemTitle: {
     fontSize: 18,
-    marginBottom: 20,
+    fontWeight: "bold",
   },
   item: {
-    fontSize: 18,
-    padding: 5,
+    padding: 15,
+    borderWidth: 1,
+    marginBottom: 10,
+    width: "100%",
+  },
+  button: {
+    padding: 10,
+    backgroundColor: "blue",
+    marginBottom: 20,
+  },
+  buttonText: {
+    color: "white",
   },
 });

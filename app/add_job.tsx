@@ -2,24 +2,28 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Button, StyleSheet, TextInput, View } from "react-native";
+import { Job } from "./jobs_entries_type";
 
-export default function ModalScreen() {
-  const [value, setValue] = useState("");
+export default function AddJob() {
+  const [title, setTitle] = useState("");
   const router = useRouter();
 
-  const addNumber = async () => {
+  const addJob = async () => {
     try {
       // Load existing transactions
-      const stored = await AsyncStorage.getItem("@transactions");
-      const transactions = stored ? JSON.parse(stored) : [];
+      const stored = await AsyncStorage.getItem("@jobs");
+      const jobs: Job[] = stored ? JSON.parse(stored) : [];
 
-      // Validate number
-      if (isNaN(Number(value))) return;
-      // Add a new number
-      transactions.push(Number(value));
+      const newJob: Job = {
+        id: Date.now().toString(),
+        title,
+        entries: [],
+      };
 
-      // Save back to AsyncStorage
-      await AsyncStorage.setItem("@transactions", JSON.stringify(transactions));
+      jobs.push(newJob);
+
+      // Save added job
+      await AsyncStorage.setItem("@jobs", JSON.stringify(jobs));
 
       // Go back to home
       router.back();
@@ -31,13 +35,13 @@ export default function ModalScreen() {
   return (
     <View style={styles.container}>
       <TextInput
-        placeholder="Enter a number"
-        value={value}
-        onChangeText={setValue}
+        placeholder="Job Title"
+        value={title}
+        onChangeText={setTitle}
         keyboardType="numeric"
         style={styles.input}
       />
-      <Button title="Add Transaction" onPress={addNumber} />
+      <Button title="Add Job" onPress={addJob} />
       <Button title="Cancel" onPress={() => router.back()} />
     </View>
   );
@@ -53,7 +57,7 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     padding: 10,
-    width: 200,
+    width: 250,
     marginBottom: 20,
   },
 });
